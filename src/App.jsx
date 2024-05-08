@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./components/navbar";
 import "./App.css";
 
 function App() {
     const [todo, setTodo] = useState("");
     const [todos, setTodos] = useState([]);
+
+    useEffect(() => {
+        let savedTodos = localStorage.getItem("todos");
+        if (savedTodos) {
+            setTodos(JSON.parse(savedTodos));
+        }
+    }, []);
 
     const handleEdit = (index) => {
         const updatedTodos = todos.map((item, i) => {
@@ -15,16 +22,19 @@ function App() {
             return item;
         });
         setTodos(updatedTodos);
+        saveTOlocalStorage();
     };
 
     const handleDelete = (index) => {
         const updatedTodos = todos.filter((item, i) => i !== index);
         setTodos(updatedTodos);
+        saveTOlocalStorage();
     };
 
     const handleAdd = () => {
         setTodos([...todos, { todo, isCompleted: false }]);
         setTodo("");
+        saveTOlocalStorage();
     };
 
     const handleCheckboxChange = (index) => {
@@ -35,6 +45,11 @@ function App() {
             return item;
         });
         setTodos(updatedTodos);
+        saveTOlocalStorage();
+    };
+
+    const saveTOlocalStorage = () => {
+        localStorage.setItem("todos", JSON.stringify(todos));
     };
 
     return (
@@ -48,7 +63,7 @@ function App() {
                 <div className='addToDo'>
                     <h2 className='text-lg font-bold'>Add a todo</h2>
                     <input className='w-80 ' type='text' value={todo} onChange={(e) => setTodo(e.target.value)} />
-                    <button onClick={handleAdd} className='bg-violet-800 hover:bg-violet-950 p-3 py-1 text-white rounded-md mx-4'>
+                    <button disabled={todo.length < 5} onClick={handleAdd} className='bg-violet-800 hover:bg-violet-950 p-3 py-1 text-white rounded-md mx-4'>
                         ADD
                     </button>
                 </div>
